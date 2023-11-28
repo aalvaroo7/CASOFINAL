@@ -1,8 +1,8 @@
-#include <iostream>
-#include <vector>
-#include <map>
-#include <string>
+struct Entorno {
+    std::map<std::string, Variant> variables;
 
+    // Puedes agregar funciones o datos adicionales según sea necesario
+};
 namespace jsonlib {
 
     class Json {
@@ -78,4 +78,5 @@ namespace jsonlib {
         }
         return ""; // Nunca debería llegar aquí
     }
+
 }  // namespace jsonlib
