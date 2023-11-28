@@ -1,47 +1,81 @@
+#include <iostream>
 #include <vector>
-#include <string>
 #include <map>
-#include "json11.hpp" // Asegúrate de tener esta biblioteca en tu sistema
-#include "jsonlib.hpp" // No estoy seguro de qué biblioteca es esta, asegúrate de tenerla en tu sistema
+#include <string>
 
-enum variant_type { Symbol, Number, List, Proc, Lambda, Cadena };
+namespace jsonlib {
 
-struct Entorno;
+    class Json {
+    public:
+        enum JsonType { Object, Array, String, Number, Boolean, Null };
 
-class Variant {
-public:
-    typedef Variant(*proc_type) ( const std::vector<Variant>& );
-    typedef std::vector<Variant>::const_iterator iter;
-    typedef std::map<std::string, Variant> map;
+        // Constructor predeterminado
+        Json() : type(Null) {}
 
-    variant_type type;
-    std::string val;
-    std::vector<Variant> list;
-    proc_type proc;
-    Entorno* env;
+        // Constructor para valores booleanos
+        Json(bool value) : type(Boolean), boolValue(value) {}
 
-    Variant(variant_type type = Symbol) : type(type) , env(0), proc(0) { }
-    Variant(variant_type type, const std::string& val) : type(type), val(val) , env(0) , proc(0) { }
-    Variant(proc_type proc) : type(Proc), proc(proc) , env(0) { }
+        // Constructor para números
+        Json(double value) : type(Number), numberValue(value) {}
 
-    std::string to_string();
-    std::string to_json_string();
-    static Variant from_json_string(std::string json);
-    static Variant parse_json(jsonlib::Json job);  // Asegúrate de que esta es la definición correcta de la función
-};
+        // Constructor para cadenas
+        Json(const std::string& value) : type(String), stringValue(value) {}
 
-std::string Variant::to_string() {
-    // Tu implementación aquí
-}
+        // Constructor para objetos JSON
+        Json(const std::map<std::string, Json>& value) : type(Object), objectValue(value) {}
 
-std::string Variant::to_json_string() {
-    // Tu implementación aquí
-}
+        // Constructor para arrays JSON
+        Json(const std::vector<Json>& value) : type(Array), arrayValue(value) {}
 
-Variant Variant::from_json_string(std::string sjson) {
-    // Tu implementación aquí
-}
+        // Función para convertir a cadena JSON
+        std::string to_string() const;
 
-Variant Variant::parse_json(jsonlib::Json job) {
-    // Tu implementación aquí
-}
+    private:
+        JsonType type;
+        bool boolValue;
+        double numberValue;
+        std::string stringValue;
+        std::map<std::string, Json> objectValue;
+        std::vector<Json> arrayValue;
+    };
+
+    std::string Json::to_string() const {
+        switch (type) {
+            case Object: {
+                std::string result = "{";
+                bool first = true;
+                for (const auto& pair : objectValue) {
+                    if (!first) {
+                        result += ",";
+                    }
+                    result += "\"" + pair.first + "\":" + pair.second.to_string();
+                    first = false;
+                }
+                result += "}";
+                return result;
+            }
+            case Array: {
+                std::string result = "[";
+                bool first = true;
+                for (const auto& element : arrayValue) {
+                    if (!first) {
+                        result += ",";
+                    }
+                    result += element.to_string();
+                    first = false;
+                }
+                result += "]";
+                return result;
+            }
+            case String:
+                return "\"" + stringValue + "\"";
+            case Number:
+                return std::to_string(numberValue);
+            case Boolean:
+                return boolValue ? "true" : "false";
+            case Null:
+                return "null";
+        }
+        return ""; // Nunca debería llegar aquí
+    }
+}  // namespace jsonlib
