@@ -1,8 +1,21 @@
+#include <iostream>
+#include <sstream>
+#include <vector>
+#include <map>
+#include <string>
+
+// Declaración de la estructura Variant
+struct Variant {
+    // Agrega aquí los miembros de la estructura
+};
+
+// Declaración de la estructura Entorno
 struct Entorno {
     std::map<std::string, Variant> variables;
 
     // Puedes agregar funciones o datos adicionales según sea necesario
 };
+
 namespace jsonlib {
 
     class Json {
